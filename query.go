@@ -9,7 +9,7 @@ type QueryFields struct {
 // A QueryQuery is used to perform a full text search.
 type QueryQuery struct {
 	Fields   []string `json:"fields,omitempty"`
-	Value    string   `json:"fields,omitempty"`
+	Value    string   `json:"value,omitempty"`
 	Operator string   `json:"operator,omitempty"`
 }
 

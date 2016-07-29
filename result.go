@@ -1,6 +1,9 @@
 package rwapi
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"reflect"
+)
 
 // A ResultItem stores a result item (resource).
 type ResultItem struct {
@@ -39,4 +42,22 @@ type Result struct {
 	Count      int             `json:"count"`
 	Data       []*ResultItem   `json:"data"`
 	Embedded   *ResultEmbedded `json:"embedded"`
+}
+
+// GetItems returns the resource items from the response payload.
+// This function takes a pointer to a slice. The resource items will
+// be unserialized into the slice elements' type.
+func (r *Result) GetItems(a interface{}) error {
+	av := reflect.ValueOf(a).Elem()
+	at := av.Type().Elem()
+
+	for _, item := range r.Data {
+		v := reflect.New(at)
+		i := v.Interface()
+		if err := json.Unmarshal(item.Fields, &i); err != nil {
+			return err
+		}
+		av.Set(reflect.Append(av, reflect.Indirect(v)))
+	}
+	return nil
 }
