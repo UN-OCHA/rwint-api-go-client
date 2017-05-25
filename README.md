@@ -16,8 +16,9 @@ import (
   "bytes"
   "encoding/json"
   "log"
+  "time"
 
-  "github.com/reliefweb/api-go-client"
+  "github.com/reliefweb/api-go-client".
 )
 
 // Define a resource structure.
@@ -34,7 +35,9 @@ type RWAPIReport struct {
 }
 
 func main() {
-  client := rwapi.NewClient()
+  // Create a client with the name of the application or website using the API
+  // and a timeout of 5 seconds.
+  client := rwapi.NewClient("example.com", 5*time.Second)
 
   // Filter to retrieve all OCHA headlines.
   filter := rwapi.NewFilter()
@@ -45,7 +48,7 @@ func main() {
   // Aggregation of countries for thoses headlines.
   facet := rwapi.NewFacet()
   facet.SetField("country")
-  facet.SetSort("count", "asc")
+  facet.SetSort("count", "desc")
   facet.SetLimit(10)
 
   // Aggregation of the publication years for those headlines.
@@ -77,7 +80,6 @@ func main() {
   if err := json.Indent(&data, raw, "", "\t"); err != nil {
     log.Fatal(err)
   }
-  log.Println(data.String())
 
   // Unserialize the json response payload.
   var result *rwapi.Result
@@ -86,7 +88,8 @@ func main() {
   }
 
   // Print the first date facet year.
-  log.Println(result.Embedded.Facets["date"].Data[0].Value)
+  country := result.Embedded.Facets["country"].Data[0]
+  log.Printf("Most tagged country: %s with %d headlines\n", country.Value, country.Count)
 
   // Print the headline titles.
   for _, item := range result.Data {

@@ -19,7 +19,7 @@ type Client struct {
 }
 
 // NewClient creates a new ReliefWeb API client.
-// Appname identifies the application using querying the API.
+// Appname identifies the application querying the API.
 // Timeout sepcifies the time limit for the request.
 // That includes the connection, redirects and reading the response body.
 func NewClient(appname string, timeout time.Duration) *Client {
@@ -36,6 +36,8 @@ func (c *Client) QueryRaw(resource string, query *Query) ([]byte, error) {
 	// Add the appname to know who is using the API.
 	if c.AppName != "" {
 		url += "?appname=" + c.AppName
+	} else {
+		url += "?appname=rw-api-go-client"
 	}
 
 	data, err := json.Marshal(query)
